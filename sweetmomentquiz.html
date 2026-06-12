@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sweet moment quiz ❤️</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#ff9a9e,#fad0c4,#fad0c4);
+    overflow:hidden;
+}
+
+.container{
+    width:90%;
+    max-width:800px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(15px);
+    border-radius:25px;
+    padding:30px;
+    text-align:center;
+    color:white;
+    box-shadow:0 0 30px rgba(255,255,255,0.3);
+}
+
+h1{
+    margin-bottom:20px;
+    text-shadow:0 0 15px rgba(255,255,255,0.8);
+}
+
+#timer{
+    font-size:24px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+#question{
+    font-size:24px;
+    margin-bottom:20px;
+}
+
+.answer{
+    width:100%;
+    padding:15px;
+    margin:10px 0;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    font-size:16px;
+    background:#ff6b81;
+    color:white;
+    transition:0.3s;
+}
+
+.answer:hover{
+    background:#ff4757;
+}
+
+.correct{
+    background:#2ed573 !important;
+}
+
+.wrong{
+    background:#ff3838 !important;
+}
+
+#progress{
+    margin-bottom:15px;
+    font-size:18px;
+}
+
+.heart{
+    position:fixed;
+    color:white;
+    animation:fall linear forwards;
+    pointer-events:none;
+}
+
+@keyframes fall{
+    from{
+        transform:translateY(-50px);
+        opacity:1;
+    }
+    to{
+        transform:translateY(100vh);
+        opacity:0;
+    }
+}
+
+#result{
+    font-size:22px;
+    line-height:1.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>❤️Sweet moment quiz ❤️</h1>
+
+    <div id="progress"></div>
+    <div id="timer">10</div>
+
+    <div id="question"></div>
+
+    <div id="answers"></div>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+
+const questions = [
+
+{
+question:"Dimana pertama kali kita berdua memulai chat?",
+answers:["WhatsApp","Instagram","LINE","Facebook"],
+correct:1
+},
+
+{
+question:"Dimana pertama kali kita berdua bertemu?",
+answers:["Mall","Kafe","Hotel","Stasiun"],
+correct:2
+},
+
+{
+question:"Apa nama hotel pertama kali kita bertemu?",
+answers:["Kyoto Tower Hotel","Urban Kyoto Hotel","APA Hotel","Mitsui Garden Hotel"],
+correct:1
+},
+
+{
+question:"Tanggal berapa kita pertama kali bertemu?",
+answers:["20 Mei","21 Mei","22 Mei","23 Mei"],
+correct:2
+},
+
+{
+question:"Apa nama sungai yang kita kunjungi?",
+answers:["Yodo River","Kamogawa","Katsura River","Uji River"],
+correct:1
+},
+
+{
+question:"Apa warna outfit yang kita gunakan di hari pertama?",
+answers:["Putih dan Hitam","Hitam dan Abu-abu","Biru dan Putih","Hitam dan Merah"],
+correct:1
+},
+
+{
+question:"Kendaraan apa yang kita gunakan saat akan pergi nge-date di malam hari?",
+answers:["Bus","Kereta","Motor","Taksi"],
+correct:3
+},
+
+{
+question:"Apa nama outlet tempat kamu membeli dress?",
+answers:["GU","Uniqlo","H&M","Forever 21"],
+correct:2
+},
+
+{
+question:"Dimana tempat pasanganmu membeli baju?",
+answers:["Uniqlo","GU","H&M","ZARA"],
+correct:3
+},
+
+{
+question:"Apa yang kita makan sebelum saling berpisah?",
+answers:["Burger","Donut","Pizza","Ramen"],
+correct:1
+}
+
+];
+
+let currentQuestion = 0;
+let timer = 10;
+let interval;
+
+function loadQuestion(){
+
+    clearInterval(interval);
+
+    timer = 10;
+    document.getElementById("timer").innerHTML =
+    "⏳ "+timer+" detik";
+
+    document.getElementById("progress").innerHTML =
+    `Soal ${currentQuestion+1} dari ${questions.length}`;
+
+    document.getElementById("question").innerHTML =
+    questions[currentQuestion].question;
+
+    const answersDiv =
+    document.getElementById("answers");
+
+    answersDiv.innerHTML="";
+
+    questions[currentQuestion].answers.forEach((ans,index)=>{
+
+        const btn=document.createElement("button");
+
+        btn.className="answer";
+
+        btn.innerHTML=ans;
+
+        btn.onclick=()=>checkAnswer(index,btn);
+
+        answersDiv.appendChild(btn);
+
+    });
+
+    interval=setInterval(()=>{
+
+        timer--;
+
+        document.getElementById("timer").innerHTML=
+        "⏳ "+timer+" detik";
+
+        if(timer<=0){
+
+            clearInterval(interval);
+
+            showFail();
+
+        }
+
+    },1000);
+
+}
+
+function checkAnswer(selected,btn){
+
+    clearInterval(interval);
+
+    const buttons=
+    document.querySelectorAll(".answer");
+
+    buttons.forEach(b=>b.disabled=true);
+
+    if(selected===questions[currentQuestion].correct){
+
+        btn.classList.add("correct");
+
+        setTimeout(()=>{
+
+            currentQuestion++;
+
+            if(currentQuestion<questions.length){
+
+                loadQuestion();
+
+            }else{
+
+                showSuccess();
+
+            }
+
+        },800);
+
+    }else{
+
+        btn.classList.add("wrong");
+
+        buttons[questions[currentQuestion].correct]
+        .classList.add("correct");
+
+        setTimeout(()=>{
+
+            showFail();
+
+        },1200);
+    }
+}
+
+function showFail(){
+
+    document.getElementById("question").innerHTML=
+    "💔 Yah Sayang...";
+
+    document.getElementById("answers").innerHTML="";
+
+    document.getElementById("timer").innerHTML="";
+
+    document.getElementById("progress").innerHTML="";
+
+    document.getElementById("result").innerHTML=
+    "Sepertinya ada beberapa kenangan yang terlupa 😢<br><br>Coba lagi ya ❤️";
+}
+
+function showSuccess(){
+
+    document.getElementById("question").innerHTML="";
+
+    document.getElementById("answers").innerHTML="";
+
+    document.getElementById("timer").innerHTML="";
+
+    document.getElementById("progress").innerHTML="";
+
+    document.getElementById("result").innerHTML=
+    `
+    ❤️ <b>Selamat Sayang ❤️</b><br><br>
+
+    Kamu berhasil menjawab semua pertanyaan tentang kisah kita. 🥰<br><br>
+
+    Terima kasih sudah mengingat semuanya, mulai dari awal kita berkenalan, pertama kali bertemu, hingga momen-momen kecil yang kita lalui bersama.<br><br>
+
+ 
+
+    Aku sayang kamu hari ini, besok, dan seterusnya. 🥰<br><br>
+
+    <b>I Love You ❤️</b>
+    `;
+
+    startHearts();
+}
+
+function startHearts(){
+
+    setInterval(()=>{
+
+        const heart=document.createElement("div");
+
+        heart.className="heart";
+
+        heart.innerHTML="❤️";
+
+        heart.style.left=Math.random()*100+"vw";
+
+        heart.style.fontSize=
+        (20+Math.random()*30)+"px";
+
+        heart.style.animationDuration=
+        (3+Math.random()*4)+"s";
+
+        document.body.appendChild(heart);
+
+        setTimeout(()=>{
+            heart.remove();
+        },7000);
+
+    },250);
+
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
